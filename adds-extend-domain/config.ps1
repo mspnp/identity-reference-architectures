@@ -1,8 +1,5 @@
-# DomainName   - Active Directory Domain e.g.: contoso
-# AdminCreds   - Active Directory Domain Admin PSCredentials object
 Configuration Config {
     param
-    #v1.4
     (
         [Parameter(Mandatory)]
         [string]$DomainName,
@@ -14,7 +11,10 @@ Configuration Config {
         [System.Management.Automation.PSCredential]$AdminCreds
     )
 
-    Import-DscResource -ModuleName xComputerManagement, xActiveDirectory, xNetworking
+    Import-DscResource -ModuleName PSDesiredStateConfiguration
+    Import-DscResource -ModuleName ActiveDirectoryDsc
+    Import-DscResource -ModuleName ComputerManagementDsc
+    Import-DscResource -ModuleName NetworkingDsc
        
     [System.Management.Automation.PSCredential ]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($AdminCreds.UserName)", $AdminCreds.Password)
 
@@ -23,11 +23,17 @@ Configuration Config {
 
     Node localhost
     {
+        LocalConfigurationManager
+        {
+            ConfigurationMode = 'ApplyOnly'
+            RebootNodeIfNeeded = $true
+        }
+
+        # Allows this machine to find the PDC and its DNS server
         [ScriptBlock]$SetScript =
         {
             Set-DnsClientServerAddress -InterfaceAlias ("$InterfaceAlias") -ServerAddresses ("$PrimaryDcIpAddress")
         }
-
         Script SetDnsServerAddressToFindPDC
         {
             GetScript = {return @{}}
@@ -35,19 +41,21 @@ Configuration Config {
             SetScript = $SetScript.ToString().Replace('$PrimaryDcIpAddress', $PrimaryDcIpAddress).Replace('$InterfaceAlias', $InterfaceAlias)
         }
 
-        xComputer JoinDomain
+        Computer JoinDomain
         {
             DomainName = $DomainName
             Credential = $DomainCreds
             Name = $env:COMPUTERNAME
+            DependsOn   = @("[Script]SetDnsServerAddressToFindPDC")
         }
 
         # Now make sure this computer uses itself as a DNS source
-        xDnsServerAddress DnsServerAddress
+        DnsServerAddress DnsServerAddress1
         {
             Address        = @('127.0.0.1', $PrimaryDcIpAddress)
             InterfaceAlias = $InterfaceAlias
             AddressFamily  = 'IPv4'
+            DependsOn   = "[Computer]JoinDomain"
         }
 
         #Install the IIS Role

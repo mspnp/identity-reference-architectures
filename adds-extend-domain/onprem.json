@@ -112,14 +112,14 @@
               ],
               "extensions": [
                 {
-                  "name": "addsc",
+                  "name": "addsc-pdc",
                   "publisher": "Microsoft.Powershell",
                   "type": "DSC",
                   "typeHandlerVersion": "2.7",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                      "configuration": {
-                        "url": "https://github.com/mspnp/identity-reference-architectures/raw/master/adds-extend-domain/adds.zip",
+                    "configuration": {
+                        "url": "https://github.com/mspnp/identity-reference-architectures/raw/pabrus/addsextend_fix_vmextension/adds-extend-domain/adds.zip",
                         "script":"onprem-primary.ps1",
                         "function": "CreateForest"
                     }
@@ -127,11 +127,6 @@
                   "protectedSettings": {
                     "configurationArguments": {
                       "DomainName": "contoso.com",
-                      "DomainNetbiosName": "CONTOSO",
-                      "SiteName": "Azure-Vnet-Site",
-                      "OnpremSiteName": "Default-First-Site-Name",
-                      "Cidr": "10.0.0.0/16",
-                      "ReplicationFrequency": 10,
                       "AdminCreds": {
                         "UserName": "testadminuser",
                         "Password": ""
@@ -152,18 +147,57 @@
           "settings": [
             {
               "vms": [
-                "ad-vm2"
+                "ad-vm1"
               ],
               "extensions": [
                 {
-                  "name": "addsc",
+                  "name": "addsc-pdc",
                   "publisher": "Microsoft.Powershell",
                   "type": "DSC",
                   "typeHandlerVersion": "2.7",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "configuration": {
-                        "url": "https://github.com/mspnp/identity-reference-architectures/raw/master/adds-extend-domain/adds.zip",
+                        "url": "https://github.com/mspnp/identity-reference-architectures/raw/pabrus/addsextend_fix_vmextension/adds-extend-domain/adds.zip",
+                        "script":"onprem-replication.ps1",
+                        "function": "CreateReplication"
+                    }
+                  },
+                  "protectedSettings": {
+                    "configurationArguments": {
+                      "DomainName": "contoso.com",
+                      "SiteName": "Azure-Vnet-Site",
+                      "OnpremSiteName": "Default-First-Site-Name",
+                      "Cidr": "10.0.0.0/16",
+                      "ReplicationFrequency": 10,
+                      "AdminCreds": {
+                        "UserName": "testadminuser",
+                        "Password": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "VirtualMachineExtension",
+          "settings": [
+            {
+              "vms": [
+                "ad-vm2"
+              ],
+              "extensions": [
+                {
+                  "name": "addsc-sdc",
+                  "publisher": "Microsoft.Powershell",
+                  "type": "DSC",
+                  "typeHandlerVersion": "2.7",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "configuration": {
+                        "url": "https://github.com/mspnp/identity-reference-architectures/raw/pabrus/addsextend_fix_vmextension/adds-extend-domain/adds.zip",
                         "script":"onprem-secondary.ps1",
                         "function": "CreateDomainController"
                     }
@@ -171,7 +205,6 @@
                   "protectedSettings": {
                     "configurationArguments": {
                       "DomainName": "contoso.com",
-                      "DomainNetbiosName": "CONTOSO",
                       "PrimaryDcIpAddress": "192.168.0.4",
                       "AdminCreds": {
                         "UserName": "testadminuser",

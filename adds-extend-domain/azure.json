@@ -128,12 +128,11 @@
                 "typeHandlerVersion": "2.7",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                      "configuration": 
-                      {
-                      "url": "https://github.com/mspnp/identity-reference-architectures/raw/master/adds-extend-domain/adds.zip",
+                    "configuration": {
+                      "url": "https://github.com/mspnp/identity-reference-architectures/raw/pabrus/addsextend_fix_vmextension/adds-extend-domain/adds.zip",
                       "script":"azure.ps1",
                       "function": "CreateDomainController"
-                      }
+                    }
                   },
                   "protectedSettings": {
                     "configurationArguments": {
@@ -201,7 +200,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "configuration": {
-                    "url": "https://github.com/mspnp/identity-reference-architectures/raw/master/adds-extend-domain/adds.zip",
+                    "url": "https://github.com/mspnp/identity-reference-architectures/raw/pabrus/addsextend_fix_vmextension/adds-extend-domain/adds.zip",
                     "script": "config.ps1",
                     "function": "Config"
                   }
