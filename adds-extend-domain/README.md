@@ -30,51 +30,56 @@ A deployment for this architecture is available on [GitHub][github]. Note that t
 
 ### Deploy the simulated on-premises datacenter
 
-1. Navigate to the `identity/adds-extend-domain` folder of the GitHub repository.
+1. Navigate to the `./adds-extend-domain` folder of the GitHub repository.
 
 2. Open the `onprem.json` file. Search for instances of `adminPassword` and `Password` and add values for the passwords.
 
 3. Run the following command and wait for the deployment to finish:
 
-    ```bash
-    azbb -s <subscription_id> -g <resource group> -l <location> -p onprem.json --deploy
-    ```
+   ```bash
+   azbb -s <subscription_id> -g <resource group> -l <location> -p onprem.json --deploy
+   ```
 
 ### Deploy the Azure VNet
 
-1. Open the `azure.json` file.  Search for instances of `adminPassword` and `Password` and add values for the passwords. 
+1. Open the `azure.json` file. Search for instances of `adminPassword` and `Password` and add values for the passwords.
 
-2. In the same file, search for instances of `sharedKey` and enter shared keys for the VPN connection. 
+2. In the same file, search for instances of `sharedKey` and enter shared keys for the VPN connection.
 
-    ```bash
-    "sharedKey": "",
-    ```
+   ```bash
+   "sharedKey": "",
+   ```
 
 3. Run the following command and wait for the deployment to finish.
 
-    ```bash
-    azbb -s <subscription_id> -g <resource group> -l <location> -p azure.json --deploy
-    ```
+   ```bash
+   azbb -s <subscription_id> -g <resource group> -l <location> -p azure.json --deploy
+   ```
 
    Deploy to the same resource group as the on-premises VNet.
 
 ### Test connectivity with the Azure VNet
 
-After deployment completes, you can test conectivity from the simulated on-premises environment to the Azure VNet.
+After deployment completes, you can test connectivity from the simulated on-premises environment to the Azure VNet.
 
 1. Use the Azure portal, navigate to the resource group that you created.
 
-2. Find the VM named `ra-onpremise-mgmt-vm1`.
+2. Create a new Network security group, named `ra-onpremise-mgmt-vm1-nsg`, and add a Inbound security rules for RDP service allowing any resource and any destination.
 
-3. Click `Connect` to open a remote desktop session to the VM. The username is `contoso\testuser`, and the password is the one that you specified in the `onprem.json` parameter file.
+3. Find the network interface named `ra-onpremise-mgmt-vm1-nic1` and associate the Network security group named `ra-onpremise-mgmt-vm1-nsg`
 
-4. From inside your remote desktop session, open another remote desktop session to 10.0.4.4, which is the IP address of the VM named `adds-vm1`. The username is `contoso\testuser`, and the password is the one that you specified in the `azure.json` parameter file.
+4. Find the VM named `ra-onpremise-mgmt-vm1`.
 
-5. From inside the remote desktop session for `adds-vm1`, go to **Server Manager** and click **Add other servers to manage.** 
+5. Click `Connect` to open a remote desktop session to the VM. The username is `contoso\testuser`, and the password is the one that you specified in the `onprem.json` parameter file.
 
-6. In the **Active Directory** tab, click **Find now**. You should see a list of the AD, AD DS, and Web VMs.
+6. From inside your remote desktop session, open another remote desktop session to 10.0.4.4, which is the IP address of the VM named `adds-vm1`. The username is `testadminuser`, and the password is the one that you specified in the `azure.json` parameter file.
+
+7. From inside the remote desktop session for `adds-vm1`, go to **Server Manager** and click **Add other servers to manage.**
+
+8. In the **Active Directory** tab, click **Find now**. You should see a list of the AD, AD DS, and Web VMs.
 
    ![](../images/add-servers-dialog.png)
 
 <!-- links -->
-[GitHub]: https://github.com/mspnp/identity-reference-architectures/tree/master/adds-extend-domain
+
+[github]: https://github.com/mspnp/identity-reference-architectures/tree/master/adds-extend-domain
